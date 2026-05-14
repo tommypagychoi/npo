@@ -1,0 +1,2037 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Project Studio</title>
+  <style>
+    :root {
+      --bg: #f4f5f8;
+      --surface: #ffffff;
+      --side: #fbfbfd;
+      --line: #e2e5ea;
+      --text: #111827;
+      --muted: #667085;
+      --blue: #4d7df3;
+      --blue-soft: #edf3ff;
+      --pink-rail: #f6d8ef;
+      --chip: #f3f6fb;
+      --shadow: 0 2px 10px rgba(16, 24, 40, .08);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+      color: inherit;
+    }
+
+    button {
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .app {
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 50px 350px 1fr 400px;
+      grid-template-rows: 72px 1fr;
+      background: var(--bg);
+    }
+
+    .rail {
+      grid-row: 1 / 3;
+      background: var(--pink-rail);
+      border-right: 1px solid #edcbe5;
+      display: grid;
+      align-content: start;
+      justify-items: center;
+      gap: 12px;
+      padding: 12px 0;
+    }
+
+    .rail-btn {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      color: #475467;
+      font-size: 20px;
+    }
+
+    .rail-btn.active {
+      background: #ffffff;
+      color: var(--blue);
+      box-shadow: var(--shadow);
+    }
+
+    .topbar {
+      grid-column: 2 / 5;
+      grid-row: 1;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: 310px 1fr 180px;
+      align-items: center;
+      gap: 24px;
+      padding: 0 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      letter-spacing: .02em;
+      color: #1f2937;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      width: 30px;
+      height: 18px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .brand-mark::before,
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #17b7d8, #4e7cf0);
+      transform: skewX(28deg);
+    }
+
+    .brand-mark::before { width: 22px; left: 0; top: 1px; }
+    .brand-mark::after { width: 24px; right: 0; bottom: 1px; }
+    .brand span span { color: #4e7cf0; }
+
+    .nav-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 44px;
+      height: 100%;
+      align-items: center;
+      font-size: 18px;
+      font-weight: 650;
+    }
+
+    .nav-tab {
+      height: 100%;
+      display: grid;
+      place-items: center;
+      position: relative;
+      color: #111827;
+      white-space: nowrap;
+    }
+
+    .nav-tab.active::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 4px;
+      border-radius: 999px 999px 0 0;
+      background: #111827;
+    }
+
+    .top-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 16px;
+      font-size: 22px;
+    }
+
+    #openN8n {
+      min-width: 54px;
+      height: 34px;
+      padding: 0 12px;
+      border-radius: 9px;
+      background: #eef3ff;
+      color: #3e68d7;
+      border: 1px solid #c9d8ff;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: #dce8ff;
+      color: #416de2;
+      border: 2px solid #b9cdfd;
+      font-weight: 800;
+      font-size: 18px;
+    }
+
+    .sidebar {
+      grid-column: 2;
+      grid-row: 2;
+      background: var(--side);
+      border-right: 1px solid var(--line);
+      padding: 26px 20px;
+      overflow: auto;
+    }
+
+    .sidebar-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #394867;
+      font-size: 14px;
+      margin: 0 10px 22px;
+    }
+
+    .menu {
+      display: grid;
+      gap: 6px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 20px;
+    }
+
+    .menu-item {
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 14px;
+      border-radius: 8px;
+      font-size: 18px;
+      color: #27324a;
+      text-align: left;
+    }
+
+    .menu-item.active {
+      background: var(--blue-soft);
+      color: #2f67ff;
+      font-weight: 750;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #47536e;
+      font-size: 14px;
+      margin: 0 12px 14px;
+    }
+
+    .conversation-list {
+      display: grid;
+      gap: 8px;
+      margin: 4px 0 28px;
+      padding-left: 12px;
+      color: #1f2a44;
+      font-size: 17px;
+      line-height: 1.8;
+    }
+
+    .conversation-list strong {
+      color: #111827;
+      font-size: 18px;
+      margin-left: -2px;
+    }
+
+    .workspace {
+      grid-column: 3;
+      grid-row: 2;
+      min-width: 0;
+      height: calc(100vh - 72px);
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      background: #f1f2f5;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .app.agent-mode .workspace {
+      grid-column: 3 / 5;
+    }
+
+    .app.agent-mode .right-panel {
+      display: none;
+    }
+
+    .hero {
+      display: grid;
+      place-items: center;
+      min-height: 0;
+      padding-bottom: 80px;
+    }
+
+    .hero[hidden] { display: none; }
+
+    .hero-inner {
+      text-align: center;
+      transform: translateY(30px);
+    }
+
+    .chat-logo {
+      width: 82px;
+      height: 82px;
+      margin: 0 auto 22px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: var(--blue);
+      color: white;
+      box-shadow: 0 10px 28px rgba(77, 125, 243, .22);
+    }
+
+    .chat-logo svg { width: 42px; height: 42px; }
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      margin: 0;
+      color: #56637a;
+      font-size: 15px;
+      font-weight: 650;
+    }
+
+    .workspace-chat {
+      min-height: 0;
+      height: 100%;
+      max-height: 100%;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+      padding: 46px min(7vw, 96px) 36px;
+      display: grid;
+      align-content: start;
+      gap: 14px;
+    }
+
+    .workspace-chat::-webkit-scrollbar { width: 10px; }
+    .workspace-chat::-webkit-scrollbar-thumb {
+      background: #c4cad6;
+      border-radius: 999px;
+      border: 2px solid #f1f2f5;
+    }
+    .workspace-chat::-webkit-scrollbar-track { background: transparent; }
+
+    .workspace-chat[hidden] { display: none; }
+
+    .message {
+      max-width: min(760px, 92%);
+      padding: 14px 16px;
+      border: 1px solid #d8dde8;
+      border-radius: 14px;
+      background: white;
+      box-shadow: 0 1px 4px rgba(16, 24, 40, .04);
+      white-space: pre-wrap;
+      line-height: 1.55;
+      font-size: 15px;
+    }
+
+    .message.user {
+      justify-self: end;
+      background: #eaf1ff;
+      border-color: #cfe0ff;
+    }
+
+    .message.assistant {
+      justify-self: start;
+    }
+
+    .message.system {
+      justify-self: center;
+      max-width: min(560px, 86%);
+      background: #fff8e8;
+      border-color: #f1ddaa;
+      color: #69512a;
+      font-size: 14px;
+    }
+
+    .agent-create {
+      min-height: 0;
+      overflow: auto;
+      padding: 88px min(8vw, 130px) 40px;
+      display: grid;
+      align-content: start;
+      justify-items: center;
+      gap: 24px;
+      background: linear-gradient(180deg, #f4f8ff 0%, #f1f2f5 45%, #f1f2f5 100%);
+      position: relative;
+    }
+
+    .agent-create[hidden] { display: none; }
+
+    .agent-create::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: min(540px, 48vw);
+      height: 260px;
+      opacity: .38;
+      background:
+        repeating-radial-gradient(ellipse at bottom right, transparent 0 16px, rgba(77,125,243,.45) 17px 18px);
+      clip-path: polygon(12% 45%, 100% 0, 100% 100%, 0 100%);
+      pointer-events: none;
+    }
+
+    .agent-title {
+      text-align: center;
+      max-width: 760px;
+      z-index: 1;
+    }
+
+    .agent-title h1 {
+      margin: 0 0 12px;
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+
+    .agent-title p {
+      margin: 0;
+      color: #4f5a70;
+      font-size: 16px;
+      line-height: 1.45;
+    }
+
+    .agent-cards {
+      width: min(1040px, 100%);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 44px;
+      z-index: 1;
+    }
+
+    .agent-card {
+      min-height: 440px;
+      border: 1px solid #dce2ec;
+      border-radius: 12px;
+      background: rgba(255,255,255,.88);
+      box-shadow: 0 10px 40px rgba(16,24,40,.06);
+      display: grid;
+      grid-template-rows: 1fr auto;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+    }
+
+    .agent-card:hover {
+      border-color: #b9cdfd;
+      box-shadow: 0 16px 46px rgba(77,125,243,.16);
+      transform: translateY(-2px);
+    }
+
+    .agent-card.recommended::before {
+      content: "Recommend";
+      position: absolute;
+      top: -17px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 9px 20px;
+      border-radius: 999px;
+      color: #6d4fd3;
+      background: #efe9ff;
+      border: 1px solid #d9ccff;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .agent-card-main {
+      padding: 36px 30px 18px;
+      text-align: center;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+    }
+
+    .agent-icon {
+      width: 68px;
+      height: 68px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: #eef0f4;
+      color: #3f4654;
+      font-size: 34px;
+      margin-bottom: 16px;
+    }
+
+    .agent-card h2 {
+      margin: 0 0 12px;
+      color: #5484ea;
+      font-size: 24px;
+    }
+
+    .agent-card p {
+      margin: 0;
+      color: #4f5a70;
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    .agent-card-bottom {
+      border-top: 1px solid #edf0f5;
+      padding: 22px 26px 26px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .agent-checks {
+      display: grid;
+      gap: 12px;
+      color: #343d4d;
+      font-size: 14px;
+    }
+
+    .agent-checks span::before {
+      content: "✓";
+      color: #20a45c;
+      font-weight: 900;
+      margin-right: 12px;
+    }
+
+    .agent-action {
+      height: 44px;
+      border-radius: 7px;
+      background: #4e82f3;
+      color: white;
+      font-weight: 900;
+      display: inline-grid;
+      place-items: center;
+    }
+
+    .agent-basic-create {
+      min-height: 0;
+      height: 100%;
+      overflow: auto;
+      background: #f3f6f5;
+      scrollbar-gutter: stable;
+    }
+
+    .agent-basic-create[hidden] { display: none; }
+
+    .agent-create-head {
+      min-height: 104px;
+      padding: 24px 30px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .agent-create-head h1 {
+      margin: 0 0 6px;
+      font-size: 30px;
+      letter-spacing: 0;
+    }
+
+    .agent-create-head p {
+      margin: 0;
+      color: #344054;
+      font-size: 16px;
+    }
+
+    .agent-head-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+    }
+
+    .outline-action,
+    .ghost-action,
+    .save-action,
+    .run-action {
+      height: 44px;
+      padding: 0 18px;
+      border-radius: 8px;
+      border: 1px solid #c8d3e6;
+      background: #ffffff;
+      color: #557ed9;
+      font-weight: 800;
+      box-shadow: 0 1px 2px rgba(16,24,40,.03);
+    }
+
+    .outline-action.small {
+      height: 38px;
+      padding: 0 14px;
+      justify-self: end;
+    }
+
+    .ghost-action {
+      color: #1f2937;
+      border-color: #e1e5ec;
+    }
+
+    .save-action {
+      background: #e7ebf2;
+      color: #798396;
+      border-color: #e7ebf2;
+    }
+
+    .run-action {
+      background: var(--blue);
+      color: #ffffff;
+      border-color: var(--blue);
+    }
+
+    .agent-builder-grid {
+      padding: 26px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .agent-form-card,
+    .playground-card {
+      background: #ffffff;
+      border: 1px solid #e2e6ee;
+      border-radius: 8px;
+      box-shadow: 0 8px 28px rgba(16, 24, 40, .05);
+    }
+
+    .agent-form-card {
+      padding: 24px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .form-section-title {
+      padding-bottom: 18px;
+      border-bottom: 1px solid #edf0f4;
+      font-size: 19px;
+      font-weight: 850;
+    }
+
+    .field-label {
+      margin-top: 8px;
+      color: #1f2937;
+      font-weight: 800;
+      font-size: 15px;
+    }
+
+    .field-label span { color: #e05261; }
+
+    .agent-input,
+    .agent-textarea {
+      width: 100%;
+      border: 1px solid #dfe5ef;
+      border-radius: 8px;
+      background: #ffffff;
+      outline: none;
+      padding: 13px 14px;
+      color: #344054;
+      font-size: 16px;
+    }
+
+    .agent-input:focus,
+    .agent-textarea:focus {
+      border-color: #9ebcff;
+      box-shadow: 0 0 0 3px rgba(77,125,243,.12);
+    }
+
+    .agent-textarea {
+      min-height: 138px;
+      resize: vertical;
+      line-height: 1.55;
+    }
+
+    .agent-textarea.tall { min-height: 220px; }
+
+    .cover-row {
+      display: grid;
+      grid-template-columns: 96px 1fr auto;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .cover-icon {
+      width: 88px;
+      height: 88px;
+      border-radius: 8px;
+      background: #111318;
+      color: #ffffff;
+      display: grid;
+      place-items: center;
+      font-size: 38px;
+    }
+
+    .cover-options {
+      display: grid;
+      gap: 10px;
+      color: #344054;
+    }
+
+    .cover-options em,
+    .field-note,
+    .field-help {
+      color: #667085;
+      font-size: 14px;
+    }
+
+    .radio-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+    }
+
+    .radio-row label,
+    .radio-matrix label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .image-url {
+      color: #202939;
+      font-size: 17px;
+      overflow-wrap: anywhere;
+    }
+
+    .field-help {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .radio-matrix {
+      padding: 8px 0 18px;
+      border-bottom: 1px solid #edf0f4;
+      display: grid;
+      grid-template-columns: 70px auto auto 1fr;
+      gap: 12px 20px;
+      align-items: center;
+      font-size: 16px;
+    }
+
+    .radio-label {
+      font-weight: 850;
+      font-size: 18px;
+      color: #111827;
+    }
+
+    .mcp-picker {
+      margin-top: 20px;
+      border: 1px solid #e2e6ee;
+      border-radius: 10px;
+      display: grid;
+      grid-template-columns: 420px minmax(0, 1fr);
+      overflow: hidden;
+      min-height: 520px;
+    }
+
+    .mcp-column {
+      padding: 24px;
+      display: grid;
+      align-content: start;
+      gap: 16px;
+      border-right: 1px solid #edf0f4;
+    }
+
+    .mcp-column.selected {
+      border-right: 0;
+      background: #ffffff;
+    }
+
+    .mcp-column h3 {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 22px;
+    }
+
+    .mcp-column h3 span {
+      border-radius: 999px;
+      padding: 4px 12px;
+      background: #eaf1ff;
+      color: #5279d7;
+      border: 1px solid #bdd0ff;
+      font-size: 14px;
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .filter-chip {
+      height: 38px;
+      padding: 0 16px;
+      border-radius: 999px;
+      border: 1px solid #dde3ec;
+      background: #ffffff;
+      font-weight: 800;
+      color: #344054;
+    }
+
+    .filter-chip.active {
+      background: #eaf3ff;
+      color: #416de2;
+      border-color: #b9cdfd;
+    }
+
+    .mcp-server-list {
+      max-height: 410px;
+      overflow: auto;
+      display: grid;
+      gap: 12px;
+      padding-right: 4px;
+    }
+
+    .mcp-server {
+      min-height: 88px;
+      border: 1px solid #e1e6ee;
+      border-radius: 8px;
+      background: #f8faf9;
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      grid-template-rows: auto auto;
+      align-items: center;
+      gap: 2px 12px;
+      padding: 14px 16px;
+      text-align: left;
+    }
+
+    .mcp-server span {
+      grid-row: 1 / 3;
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: #111318;
+      color: #ffffff;
+    }
+
+    .mcp-server strong {
+      font-size: 17px;
+      line-height: 1.25;
+    }
+
+    .mcp-server small {
+      color: #667085;
+      font-size: 14px;
+    }
+
+    .mcp-server.selected {
+      border-color: #8fb0ff;
+      background: #eef5ff;
+    }
+
+    .selected-empty {
+      min-height: 360px;
+      display: grid;
+      place-items: center;
+      color: #98a2b3;
+      border-radius: 8px;
+    }
+
+    .selected-mcp-item {
+      padding: 12px 14px;
+      border: 1px solid #dfe7f5;
+      border-radius: 8px;
+      background: #f7faff;
+      font-weight: 800;
+    }
+
+    .playground-card {
+      min-height: 660px;
+      position: sticky;
+      top: 20px;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+    }
+
+    .playground-head {
+      padding: 18px;
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .playground-head h2 {
+      margin: 0 0 6px;
+      font-size: 20px;
+    }
+
+    .playground-head p {
+      margin: 0;
+      color: #667085;
+      font-size: 13px;
+    }
+
+    .agent-status {
+      margin: 0 18px 18px;
+      padding: 12px 14px;
+      border-radius: 7px;
+      color: #5270c7;
+      background: #dfe9ff;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .playground-empty {
+      border-top: 1px solid #edf0f4;
+      display: grid;
+      justify-items: center;
+      align-content: center;
+      gap: 12px;
+      padding: 38px 24px;
+      text-align: center;
+    }
+
+    .chat-logo.mini {
+      width: 78px;
+      height: 78px;
+      font-size: 34px;
+      margin-bottom: 12px;
+    }
+
+    .playground-empty h3 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .playground-empty p {
+      margin: 0 0 10px;
+      color: #667085;
+      line-height: 1.45;
+    }
+
+    .prompt-chip {
+      min-height: 32px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid #dde3ec;
+      background: #ffffff;
+      color: #344054;
+      font-weight: 650;
+    }
+
+    .playground-input {
+      border-top: 1px solid #edf0f4;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 1fr 42px;
+      gap: 8px;
+    }
+
+    .playground-input input {
+      border: 1px solid #dfe5ef;
+      border-radius: 999px;
+      padding: 0 16px;
+      min-height: 46px;
+      outline: none;
+    }
+
+    .playground-input button {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      background: #eef2f7;
+      color: #667085;
+    }
+
+    .composer-wrap {
+      padding: 0 64px 22px;
+      background: #f1f2f5;
+      z-index: 2;
+    }
+
+    .composer {
+      width: min(986px, 100%);
+      margin: 0 auto;
+      min-height: 130px;
+      background: var(--surface);
+      border: 1px solid #d8dde6;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-rows: 1fr 44px;
+      overflow: hidden;
+    }
+
+    .composer textarea {
+      width: 100%;
+      min-height: 70px;
+      padding: 20px 16px 4px;
+      resize: none;
+      outline: none;
+      border: 0;
+      font-size: 20px;
+      color: #34405c;
+    }
+
+    .composer textarea::placeholder { color: #7986a3; }
+
+    .composer-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 12px 12px 16px;
+    }
+
+    .plus-btn {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: #475467;
+      font-size: 27px;
+    }
+
+    .send-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      background: #eef0f5;
+      color: #ffffff;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+    }
+
+    .send-btn.ready { background: var(--blue); }
+
+    .right-panel {
+      grid-column: 4;
+      grid-row: 2;
+      background: var(--side);
+      border-left: 1px solid var(--line);
+      padding: 26px 20px;
+      overflow: auto;
+    }
+
+    .right-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
+
+    .agent-select {
+      width: 100%;
+      height: 50px;
+      border: 1px solid #d8dde8;
+      border-radius: 8px;
+      background: white;
+      padding: 0 16px;
+      font-size: 17px;
+      color: #5d6881;
+      margin-bottom: 20px;
+    }
+
+    .right-section {
+      border-top: 1px solid var(--line);
+      padding: 18px 0;
+    }
+
+    .right-section.collapsed .empty { display: none; }
+
+    .right-section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      font-size: 19px;
+      font-weight: 800;
+      margin-bottom: 14px;
+      text-align: left;
+    }
+
+    .empty {
+      display: grid;
+      justify-items: center;
+      gap: 10px;
+      color: #667085;
+      font-size: 15px;
+      padding: 14px 0 6px;
+    }
+
+    .empty-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 999px;
+      background: #f0f2f6;
+      display: grid;
+      place-items: center;
+      color: #394150;
+      font-size: 22px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      background: rgba(17, 24, 39, .34);
+      z-index: 20;
+    }
+
+    .modal-backdrop.open { display: grid; }
+
+    .modal {
+      width: min(960px, calc(100vw - 40px));
+      max-height: min(760px, calc(100vh - 40px));
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      box-shadow: 0 24px 70px rgba(16, 24, 40, .24);
+      display: grid;
+      grid-template-rows: auto 1fr;
+      overflow: hidden;
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .modal-body {
+      padding: 18px 20px;
+      overflow: auto;
+      display: grid;
+      gap: 12px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 120px auto;
+      gap: 8px;
+      align-items: end;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .field input, .field select {
+      width: 100%;
+      height: 40px;
+      border: 1px solid #d8dde8;
+      border-radius: 8px;
+      padding: 0 12px;
+      background: white;
+    }
+
+    .field textarea {
+      min-height: 96px;
+      border: 1px solid #d8dde8;
+      border-radius: 8px;
+      padding: 12px;
+      resize: vertical;
+    }
+
+    .action-btn {
+      height: 40px;
+      padding: 0 14px;
+      border-radius: 8px;
+      background: var(--blue);
+      color: white;
+      font-weight: 800;
+    }
+
+    .secondary-btn {
+      height: 40px;
+      padding: 0 14px;
+      border-radius: 8px;
+      background: #f3f5f9;
+      color: #344054;
+      font-weight: 800;
+    }
+
+    pre {
+      margin: 0;
+      min-height: 260px;
+      max-height: 420px;
+      overflow: auto;
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid #202b3a;
+      background: #0c1118;
+      color: #d7f7e8;
+      font: 12px/1.55 "Cascadia Mono", Consolas, ui-monospace, monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .terminal-shell {
+      min-height: 460px;
+      max-height: 560px;
+      overflow: auto;
+      padding: 16px;
+      border-radius: 10px;
+      border: 1px solid #202b3a;
+      background: #080d13;
+      color: #d7f7e8;
+      font: 15px/1.55 "Cascadia Mono", Consolas, ui-monospace, monospace;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+
+    .terminal-line {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .terminal-command { color: #effff6; font-weight: 800; }
+    .terminal-error { color: #ffad95; }
+    .terminal-muted { color: #85a195; }
+
+    .terminal-input-row {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .terminal-prompt {
+      color: #8ff2bf;
+      font-weight: 900;
+    }
+
+    .terminal-input {
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: #effff6;
+      font: inherit;
+      padding: 0;
+      height: 26px;
+    }
+
+    .chat-log {
+      min-height: 340px;
+      max-height: 500px;
+      overflow: auto;
+      display: grid;
+      align-content: start;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #f3f5f9;
+    }
+
+    .bubble {
+      max-width: 92%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #d8dde8;
+      background: white;
+      white-space: pre-wrap;
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    .bubble.user {
+      justify-self: end;
+      background: #eaf1ff;
+      border-color: #cfe0ff;
+    }
+
+    .bubble.system {
+      justify-self: center;
+      background: #fff8e8;
+      border-color: #f1ddaa;
+      color: #69512a;
+    }
+
+    .token-pop {
+      position: fixed;
+      top: 82px;
+      right: 24px;
+      width: 360px;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 14px;
+      display: none;
+      gap: 10px;
+      z-index: 15;
+    }
+
+    .token-pop.open { display: grid; }
+    .token-pop input {
+      height: 40px;
+      border: 1px solid #d8dde8;
+      border-radius: 8px;
+      padding: 0 12px;
+    }
+
+    @media (max-width: 1180px) {
+      .app {
+        grid-template-columns: 50px 300px 1fr;
+        grid-template-rows: 72px 1fr 300px;
+      }
+      .topbar { grid-column: 2 / 4; }
+      .right-panel {
+        grid-column: 2 / 4;
+        grid-row: 3;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+    }
+
+    @media (max-width: 820px) {
+      body { overflow: auto; }
+      .app { min-height: 100vh; height: auto; grid-template-columns: 1fr; grid-template-rows: auto auto auto auto; }
+      .rail { display: none; }
+      .topbar, .sidebar, .workspace, .right-panel { grid-column: 1; grid-row: auto; }
+      .topbar { grid-template-columns: 1fr; height: auto; padding: 14px; }
+      .nav-tabs { justify-content: start; gap: 20px; overflow: auto; }
+      .composer-wrap { padding: 0 16px 18px; }
+      .sidebar { max-height: 360px; }
+      .agent-cards { grid-template-columns: 1fr; gap: 20px; }
+      .agent-create { padding: 36px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="rail">
+      <button class="rail-btn">☰</button>
+      <button class="rail-btn">▦</button>
+      <button class="rail-btn">●</button>
+      <button class="rail-btn active">⌁</button>
+      <button class="rail-btn">◉</button>
+      <button class="rail-btn">＋</button>
+    </aside>
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark"></span>
+        <span>NPO WORK<span>SPACE</span></span>
+      </div>
+      <nav class="nav-tabs" aria-label="Workspace navigation">
+        <button class="nav-tab active">내 작업 공간</button>
+        <button class="nav-tab">AI 에이전트 카탈로그</button>
+        <button class="nav-tab">MCP 레지스트리</button>
+      </nav>
+      <div class="top-actions">
+        <button id="openN8n" title="N8N 대시보드 새 창 열기" aria-label="N8N 대시보드 새 창 열기">N8N</button>
+        <button id="openK8sTerminal" title="Kubernetes Terminal 새 창 열기" aria-label="Kubernetes Terminal 새 창 열기">⌨</button>
+        <button id="openTerminal" title="터미널 새 창 열기" aria-label="터미널 새 창 열기">▣</button>
+        <button id="openTools" title="운영 도구" aria-label="운영 도구">☼</button>
+        <button id="tokenButton" title="토큰 설정" aria-label="토큰 설정">⚙</button>
+        <div class="avatar">N</div>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <div class="sidebar-title">
+        <span>항해</span>
+        <span>▯</span>
+      </div>
+      <div class="menu">
+        <button class="menu-item active"><span>⌂</span><span>집</span></button>
+        <button id="newChat" class="menu-item"><span>⊞</span><span>새 채팅</span></button>
+      </div>
+
+      <div class="section-head"><span>대리인</span><span>⌄</span></div>
+      <div class="menu">
+        <button class="menu-item"><span>＋</span><span>신규 에이전트</span></button>
+        <button class="menu-item"><span>☷</span><span>내 에이전트들</span></button>
+        <button class="menu-item"><span>⌘</span><span>공유 에이전트</span></button>
+        <button class="menu-item"><span>▤</span><span>내 에이전트 인스턴스</span></button>
+      </div>
+
+      <div class="section-head"><span>대화</span><span>⌄</span></div>
+      <div class="conversation-list">
+        <strong>지난 7일</strong>
+        <span>DB점검목록</span>
+        <span>`DB 대상`</span>
+        <strong>지난 30일</strong>
+        <span>DB 일일 점검</span>
+      </div>
+    </aside>
+
+    <main class="workspace">
+      <section class="hero">
+        <div class="hero-inner">
+          <div class="chat-logo" aria-hidden="true">
+            <svg viewBox="0 0 48 48" fill="none">
+              <path d="M16.5 28.5h-2.1c-3.2 0-5.8 2.6-5.8 5.8v.7c0 1.2 1 2.2 2.2 2.2h5.1c2.8 0 5.2-1.9 5.9-4.4" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+              <path d="M21 34.5c-6.1 0-11-4.5-11-10s4.9-10 11-10 11 4.5 11 10c0 1.9-.6 3.7-1.7 5.2l1 4.8-5-1.7c-1.6 1.1-3.4 1.7-5.3 1.7Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+              <path d="M29.6 27.8c4.9-.4 8.7-4 8.7-8.5 0-4.8-4.3-8.7-9.7-8.7-3 0-5.7 1.2-7.5 3.1" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h1>안녕하세요!</h1>
+          <p>무엇을 만들고 싶으세요?</p>
+        </div>
+      </section>
+      <section id="workspaceChat" class="workspace-chat" hidden></section>
+      <section id="agentCreate" class="agent-create" hidden>
+        <div class="agent-title">
+          <h1>Create your AI Agent</h1>
+          <p>Select between Simple Mode for quick setup or Advanced Mode for comprehensive customization.<br />Each mode is designed to provide the right level of control for different use cases.</p>
+        </div>
+        <div class="agent-cards">
+          <article class="agent-card recommended">
+            <div class="agent-card-main">
+              <div class="agent-icon">⌑</div>
+              <h2>Simple Mode</h2>
+              <p>Perfect for getting started quickly. Create powerful AI agents with guided configuration and intelligent default.</p>
+            </div>
+            <div class="agent-card-bottom">
+              <div class="agent-checks">
+                <span>Quick setup with smart defaults</span>
+                <span>Chat trigger type only</span>
+                <span>Essential configuration options</span>
+                <span>Built-in testing playground</span>
+                <span>One-click deployment</span>
+              </div>
+              <button id="startSimpleAgent" class="agent-action">Start With Simple Mode</button>
+            </div>
+          </article>
+          <article class="agent-card">
+            <div class="agent-card-main">
+              <div class="agent-icon">⌘</div>
+              <h2>Advanced Mode</h2>
+              <p>Full control over every aspect of your agent. Create complex workflows with multiple triggers and sophisticated logic.</p>
+            </div>
+            <div class="agent-card-bottom">
+              <div class="agent-checks">
+                <span>Visual flow builder interface</span>
+                <span>Multiple trigger types</span>
+                <span>AZA Host agent support</span>
+                <span>Custom webhook endpoints</span>
+                <span>Scheduler & automation</span>
+              </div>
+              <button id="startAdvancedAgent" class="agent-action">Use Advanced Mode⌄</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="agentBasicCreate" class="agent-basic-create" hidden>
+        <div class="agent-create-head">
+          <div>
+            <h1>에이전트 생성</h1>
+            <p>간단한 설정으로 새로운 AI 비서를 만들어 보세요.</p>
+          </div>
+          <div class="agent-head-actions">
+            <button id="goMyAgents" class="outline-action">↗ Go to My Agents</button>
+            <button id="cancelAgent" class="ghost-action">× Cancel</button>
+            <button id="saveAgent" class="save-action">▣ Save</button>
+          </div>
+        </div>
+        <div class="agent-builder-grid">
+          <form class="agent-form-card">
+            <div class="form-section-title">ⓘ Basic Configuration</div>
+            <label class="field-label">Agent Name <span>*</span></label>
+            <input id="agentNameInput" class="agent-input" placeholder="e.g., Research Assistant, Code Helper" />
+            <div class="cover-row">
+              <div class="cover-icon">▣</div>
+              <div class="cover-options">
+                <strong>Upload cover</strong>
+                <div class="radio-row">
+                  <label><input type="radio" name="cover" checked /> Default image</label>
+                  <label><input type="radio" name="cover" /> From URL</label>
+                  <label><input type="radio" name="cover" /> Custom</label>
+                </div>
+                <em>If you select “Default image”, this MCP server will use the system’s default icon.</em>
+              </div>
+              <button type="button" class="outline-action small">☷ Icon Templates</button>
+            </div>
+            <div class="image-url">https://image.play.cloudzcp.net/images/templates/agent/default/agent.png</div>
+            <label class="field-label">Description <span>*</span></label>
+            <textarea id="agentDescription" class="agent-textarea" maxlength="5000" placeholder="Describe what your agent does and how it can help users..."></textarea>
+            <div class="field-help"><span>A brief description of your agent's purpose and capabilities.</span><span id="descCount">0/5000</span></div>
+            <label class="field-label">시스템 프롬프트 <span>*</span></label>
+            <textarea id="agentPrompt" class="agent-textarea tall" placeholder="당신은 도움이 되는 도우미입니다... 에이전트가 어떻게 동작해야 하는지, 어떤 지식을 활용해야 하는지, 그리고 사용자에게 어떻게 응답해야 하는지에 대한 자세한 지침을 작성하세요."></textarea>
+            <p class="field-note">상담원의 성격, 전문성, 행동 방식을 정의하세요. 상담원이 사용자에게 어떻게 도움을 주어야 하는지 구체적으로 설명하세요.</p>
+            <div class="radio-matrix">
+              <div class="radio-label">목적</div>
+              <label><input type="radio" name="purpose" checked /> 개인의</label>
+              <label><input type="radio" name="purpose" /> 사업</label>
+              <div class="radio-label">실행 시간</div>
+              <label><input type="radio" name="runtime" /> 독립형</label>
+              <label><input type="radio" name="runtime" checked /> 작업 공간</label>
+            </div>
+            <label class="field-label">LLM 제공자 <span>*</span></label>
+            <select class="agent-input"><option>옵션을 선택하세요</option><option>OpenAI GPT</option><option>Project Studio Default</option></select>
+            <label class="field-label">지식 데이터베이스</label>
+            <select class="agent-input"><option>지식 데이터베이스를 선택하세요</option><option>Kubernetes 운영 가이드</option><option>MCP Registry Docs</option></select>
+            <p class="field-note">상담원의 응답을 향상시키려면 지식 데이터베이스를 선택하세요.</p>
+            <div class="mcp-picker">
+              <div class="mcp-column">
+                <h3>MCP 서버 목록 <span>50</span></h3>
+                <input id="mcpSearch" class="agent-input" placeholder="⌕ 검색 서버..." />
+                <div class="filter-row">
+                  <button type="button" class="filter-chip active">✓ 모두</button>
+                  <button type="button" class="filter-chip">내부</button>
+                  <button type="button" class="filter-chip">외부</button>
+                </div>
+                <div id="mcpServerList" class="mcp-server-list">
+                  <button type="button" class="mcp-server" data-name="개념"><span>▧</span><strong>개념</strong><small>외부</small></button>
+                  <button type="button" class="mcp-server" data-name="Java SE를 위한 안전한 코딩 가이드라인"><span>✦</span><strong>Java SE를 위한 안전한 코딩 가이드라인! ✨</strong><small>외부</small></button>
+                  <button type="button" class="mcp-server" data-name="ns-splunk-macro-network-mcp"><span>⛓</span><strong>ns-splunk-macro-network-mcp</strong><small>외부</small></button>
+                  <button type="button" class="mcp-server" data-name="kdb-search-mcp-server"><span>⛓</span><strong>kdb-search-mcp-server</strong><small>외부</small></button>
+                  <button type="button" class="mcp-server" data-name="ns-splunk-macro-db-perf-mcp"><span>⛓</span><strong>ns-splunk-macro-db-perf-mcp</strong><small>외부</small></button>
+                  <button type="button" class="mcp-server" data-name="ns-splunk-macro-os-mcp"><span>⛓</span><strong>ns-splunk-macro-os-mcp</strong><small>외부</small></button>
+                </div>
+              </div>
+              <div class="mcp-column selected">
+                <h3>선택된 MCP 서버 <span id="selectedMcpCount">0 개 선택됨</span></h3>
+                <div id="selectedMcpList" class="selected-empty">선택된 MCP 서버가 없습니다.</div>
+              </div>
+            </div>
+          </form>
+          <aside class="playground-card">
+            <div class="playground-head">
+              <div><h2>Agent Playground</h2><p>Test your agent with current settings</p></div>
+              <button id="runAgentTest" class="run-action">▷ Run</button>
+            </div>
+            <div id="agentStatus" class="agent-status">● Configure agent settings</div>
+            <div class="playground-empty">
+              <div class="chat-logo mini" aria-hidden="true">☁</div>
+              <h3>Start Testing Your Agent</h3>
+              <p>Send a message to test how your agent responds with the current configuration</p>
+              <button type="button" class="prompt-chip">Hello, introduce yourself</button>
+              <button type="button" class="prompt-chip">What can you do help me with?</button>
+              <button type="button" class="prompt-chip">Show me your capabilities</button>
+            </div>
+            <div class="playground-input">
+              <input id="playgroundMessage" placeholder="Message me..." />
+              <button id="sendPlayground" type="button">⌁</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="composer-wrap">
+        <div class="composer">
+          <textarea id="chatInput" placeholder="오늘 어떻게 도와드릴까요?"></textarea>
+          <div class="composer-actions">
+            <button id="plusButton" class="plus-btn" title="운영 도구 열기">＋</button>
+            <button id="sendChat" class="send-btn" title="보내기">↑</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <aside class="right-panel">
+      <div class="right-title">
+        <span>☷ Codex Chat</span>
+        <button title="즐겨찾기">★</button>
+      </div>
+      <select id="agentSelect" class="agent-select">
+        <option>에이전트를 선택하세요</option>
+        <option>Codex Ops</option>
+        <option>Project Studio Ops</option>
+        <option>Kubernetes Assistant</option>
+        <option>MCP Manager</option>
+      </select>
+
+      <div class="right-section">
+        <button class="right-section-head" data-section="all"><span>◴ 모두</span><span>⌄</span></button>
+        <div class="empty"><div class="empty-icon">▧</div><span>찾을 수 없음</span></div>
+      </div>
+      <div class="right-section">
+        <button class="right-section-head" data-section="context"><span>⌘ 문맥</span><span>⌄</span></button>
+        <div class="empty"><div class="empty-icon">▧</div><span>찾을 수 없음</span></div>
+      </div>
+      <div class="right-section">
+        <button class="right-section-head" data-section="connector"><span>▤ 커넥터</span><span>⌄</span></button>
+        <div class="empty"><div class="empty-icon">▧</div><span>찾을 수 없음</span></div>
+      </div>
+    </aside>
+  </div>
+
+  <section id="toolsModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-label="Project Studio tools">
+      <div class="modal-head">
+        <span>Project Studio Tools · Codex Chat linked</span>
+        <button id="closeTools" class="secondary-btn">닫기</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <label class="field">Kubernetes Resource
+            <select id="resource">
+              <option value="pods">Pods</option>
+              <option value="nodes">Nodes</option>
+              <option value="namespaces">Namespaces</option>
+              <option value="deployments">Deployments</option>
+              <option value="services">Services</option>
+              <option value="ingress">Ingress</option>
+              <option value="events">Events</option>
+            </select>
+          </label>
+          <label class="field">Namespace
+            <input id="namespace" placeholder="default" />
+          </label>
+          <button id="k8sList" class="action-btn">조회</button>
+        </div>
+        <div class="form-row">
+          <label class="field">MCP Service
+            <input id="serviceName" placeholder="mcp-server.service" />
+          </label>
+          <button id="mcpStatus" class="secondary-btn">상태</button>
+          <button id="mcpLogs" class="secondary-btn">로그</button>
+        </div>
+        <div class="form-row">
+          <label class="field">Working directory
+            <input id="terminalCwd" placeholder="/home/ubuntu" />
+          </label>
+          <label class="field">Timeout
+            <input id="terminalTimeout" type="number" min="1" max="120" value="45" />
+          </label>
+          <button id="clearTerminal" class="secondary-btn">clear</button>
+        </div>
+        <div id="terminalShell" class="terminal-shell" tabindex="0">
+          <div id="terminalHistory">
+            <div class="terminal-line terminal-muted">Project Studio terminal ready. Type a command and press Enter.</div>
+          </div>
+          <div class="terminal-input-row">
+            <span class="terminal-prompt">ubuntu@haproxy01:~$</span>
+            <input id="terminalInput" class="terminal-input" autocomplete="off" spellcheck="false" autofocus />
+          </div>
+        </div>
+        <div id="chatLog" class="chat-log"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tokenPop" class="token-pop">
+    <label class="field">Operations access
+      <input id="token" type="password" autocomplete="off" />
+    </label>
+    <button id="saveToken" class="action-btn">저장</button>
+  </section>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const state = {
+      token: localStorage.getItem("projectStudioToken") || "",
+      chatMessages: JSON.parse(localStorage.getItem("projectStudioCodexChat") || "[]"),
+      terminalCommands: [],
+      terminalHistoryIndex: -1
+    };
+    $("token").value = state.token;
+
+    function headers() {
+      return { "Content-Type": "application/json", "X-API-Token": state.token };
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (ch) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+      }[ch]));
+    }
+
+    async function api(path, options = {}) {
+      const useToken = options.useToken !== false;
+      const cleanOptions = { ...options };
+      delete cleanOptions.useToken;
+      const res = await fetch(path, { ...cleanOptions, headers: { ...(useToken ? headers() : { "Content-Type": "application/json" }), ...(options.headers || {}) } });
+      const text = await res.text();
+      const data = text ? JSON.parse(text) : {};
+      if (!res.ok) throw new Error(data.detail || res.statusText);
+      return data;
+    }
+
+    function openTools() {
+      $("toolsModal").classList.add("open");
+      $("toolsModal").setAttribute("aria-hidden", "false");
+    }
+
+    function closeTools() {
+      $("toolsModal").classList.remove("open");
+      $("toolsModal").setAttribute("aria-hidden", "true");
+    }
+
+    function showWorkspaceHome() {
+      document.querySelector(".app").classList.remove("agent-mode");
+      $("agentCreate").hidden = true;
+      $("agentBasicCreate").hidden = true;
+      document.querySelector(".composer-wrap").hidden = false;
+      const hasMessages = state.chatMessages.length > 0;
+      document.querySelector(".hero").hidden = hasMessages;
+      $("workspaceChat").hidden = !hasMessages;
+    }
+
+    function showAgentCreate() {
+      document.querySelector(".app").classList.add("agent-mode");
+      $("agentCreate").hidden = true;
+      $("agentBasicCreate").hidden = false;
+      document.querySelector(".composer-wrap").hidden = true;
+      document.querySelector(".hero").hidden = true;
+      $("workspaceChat").hidden = true;
+    }
+
+    function renderChat() {
+      const modalHtml = state.chatMessages.map((item) =>
+        `<div class="bubble ${item.role}">${escapeHtml(item.content)}</div>`
+      ).join("");
+      const workspaceHtml = state.chatMessages.map((item) =>
+        `<div class="message ${item.role}">${escapeHtml(item.content)}</div>`
+      ).join("");
+      $("chatLog").innerHTML = modalHtml;
+      $("workspaceChat").innerHTML = workspaceHtml;
+      localStorage.setItem("projectStudioCodexChat", JSON.stringify(state.chatMessages.slice(-40)));
+      if (!$("agentCreate").hidden || !$("agentBasicCreate").hidden) {
+        $("chatLog").scrollTop = $("chatLog").scrollHeight;
+        $("workspaceChat").scrollTop = $("workspaceChat").scrollHeight;
+        return;
+      }
+      const hasMessages = state.chatMessages.length > 0;
+      document.querySelector(".hero").hidden = hasMessages;
+      $("workspaceChat").hidden = !hasMessages;
+      $("chatLog").scrollTop = $("chatLog").scrollHeight;
+      $("workspaceChat").scrollTop = $("workspaceChat").scrollHeight;
+    }
+
+    function setComposer(value) {
+      showWorkspaceHome();
+      $("chatInput").value = value;
+      $("sendChat").classList.toggle("ready", value.trim().length > 0);
+      $("chatInput").focus();
+    }
+
+    function ensureToken() {
+      return true;
+    }
+
+    function scrollTerminal() {
+      $("terminalShell").scrollTop = $("terminalShell").scrollHeight;
+    }
+
+    function appendTerminal(text, className = "") {
+      const line = document.createElement("div");
+      line.className = `terminal-line ${className}`;
+      line.textContent = text;
+      $("terminalHistory").appendChild(line);
+      scrollTerminal();
+    }
+
+    function setToolMessage(text) {
+      appendTerminal(text || "No output.", "terminal-muted");
+    }
+
+    async function sendChat() {
+      const message = $("chatInput").value.trim();
+      if (!message) return;
+      $("sendChat").classList.remove("ready");
+      $("chatInput").value = "";
+      state.chatMessages.push({ role: "user", content: message });
+      state.chatMessages.push({ role: "assistant", content: "생각 중..." });
+      renderChat();
+      const data = await api("/api/codex/chat", {
+        method: "POST",
+        useToken: false,
+        body: JSON.stringify({ messages: state.chatMessages.slice(0, -2), message })
+      });
+      state.chatMessages[state.chatMessages.length - 1] = { role: "assistant", content: data.message || "No response." };
+      renderChat();
+    }
+
+    function handleChatError(err) {
+      const last = state.chatMessages[state.chatMessages.length - 1];
+      if (last && last.role === "assistant" && last.content === "생각 중...") {
+        state.chatMessages[state.chatMessages.length - 1] = { role: "assistant", content: err.message };
+      } else {
+        state.chatMessages.push({ role: "assistant", content: err.message });
+      }
+      renderChat();
+    }
+
+    function submitPreset(message) {
+      showWorkspaceHome();
+      $("chatInput").value = message;
+      $("sendChat").classList.add("ready");
+      sendChat().catch(handleChatError);
+    }
+
+    async function runK8sList() {
+      if (!ensureToken()) return;
+      const resource = $("resource").value;
+      const namespace = $("namespace").value.trim();
+      const data = await api("/api/k8s/list", {
+        method: "POST",
+        body: JSON.stringify({
+          resource,
+          namespace: namespace || null,
+          allNamespaces: resource === "pods" && !namespace,
+          wide: true
+        })
+      });
+      appendTerminal(`$ kubectl get ${resource}${namespace ? ` -n ${namespace}` : resource === "pods" ? " -A" : ""}`, "terminal-command");
+      appendTerminal(data.stdout || data.stderr || "No output.", data.stderr ? "terminal-error" : "");
+    }
+
+    async function runMcp(action) {
+      if (!ensureToken()) return;
+      const service = $("serviceName").value.trim();
+      const path = action === "logs" ? "/api/mcp/logs" : "/api/mcp/action";
+      const body = action === "logs" ? { service, lines: 200 } : { service, action: "status" };
+      const data = await api(path, { method: "POST", body: JSON.stringify(body) });
+      appendTerminal(`$ systemctl ${action === "logs" ? "logs" : "status"} ${service}`, "terminal-command");
+      appendTerminal(data.stdout || data.stderr || "No output.", data.stderr ? "terminal-error" : "");
+    }
+
+    async function runTerminal(command = $("terminalInput").value.trim()) {
+      if (!ensureToken()) return;
+      if (!command) return;
+      if (command === "clear") {
+        $("terminalHistory").innerHTML = "";
+        $("terminalInput").value = "";
+        return;
+      }
+      $("terminalInput").value = "";
+      state.terminalCommands.push(command);
+      state.terminalHistoryIndex = state.terminalCommands.length;
+      appendTerminal(`$ ${command}`, "terminal-command");
+      appendTerminal("running...", "terminal-muted");
+      const data = await api("/api/terminal/run", {
+        method: "POST",
+        body: JSON.stringify({
+          command,
+          cwd: $("terminalCwd").value.trim() || null,
+          timeout: Number($("terminalTimeout").value || 45)
+        })
+      });
+      $("terminalHistory").lastElementChild?.remove();
+      if (data.stdout) appendTerminal(data.stdout);
+      if (data.stderr) appendTerminal(`[stderr]\n${data.stderr}`, "terminal-error");
+      appendTerminal(`[exit ${data.exitCode}] audit ${data.auditId}`, "terminal-muted");
+    }
+
+    $("tokenButton").addEventListener("click", () => {
+      state.chatMessages.push({ role: "system", content: "이제 토큰 없이 바로 실행할 수 있습니다." });
+      renderChat();
+    });
+    $("saveToken").addEventListener("click", () => {
+      state.token = $("token").value.trim();
+      localStorage.setItem("projectStudioToken", state.token);
+      $("tokenPop").classList.remove("open");
+    });
+    document.querySelectorAll(".nav-tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".nav-tab").forEach((item) => item.classList.remove("active"));
+        tab.classList.add("active");
+        const label = tab.textContent.trim();
+        if (label.includes("카탈로그")) {
+          openTools();
+          setToolMessage("AI agent catalog is ready. Select an agent on the right or ask GPT to create one.");
+        } else if (label.includes("MCP")) {
+          openTools();
+          setToolMessage("MCP registry tools are ready. Use MCP service status/log controls.");
+        } else {
+          closeTools();
+        }
+      });
+    });
+    document.querySelectorAll(".rail-btn").forEach((button, index) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".rail-btn").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        if (index === 5) openTools();
+        if (index === 3) setComposer("현재 서버 상태를 요약해줘.");
+      });
+    });
+    document.querySelectorAll(".menu-item").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".menu-item").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        const label = button.textContent.trim();
+        if (label.includes("신규")) setComposer("새 에이전트를 만들고 싶어. 필요한 설계를 제안해줘.");
+        if (label.includes("내 에이전트")) openTools();
+        if (label.includes("공유")) setComposer("공유 가능한 운영 에이전트 템플릿을 추천해줘.");
+        if (label.includes("인스턴스")) {
+          openTools();
+          setToolMessage("Agent instance tools are open. Type commands directly in the terminal.");
+        }
+      });
+    });
+    document.addEventListener("click", (event) => {
+      const button = event.target.closest(".menu-item");
+      if (!button) return;
+      const label = button.textContent.trim();
+      if (!label.includes("신규") && !label.includes("New Agent")) return;
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      document.querySelectorAll(".menu-item").forEach((item) => item.classList.remove("active"));
+      button.classList.add("active");
+      showAgentCreate();
+    }, true);
+    $("openK8sTerminal").addEventListener("click", () => {
+      window.open(`${window.location.origin}/terminal?mode=k8s`, "projectStudioK8sTerminal", "popup=yes,width=1180,height=760,noopener,noreferrer");
+    });
+    $("openN8n").addEventListener("click", () => {
+      window.open(`${window.location.origin}/n8n/`, "projectStudioN8n", "popup=yes,width=1280,height=860,noopener,noreferrer");
+    });
+    $("openTerminal").addEventListener("click", () => {
+      window.open(`${window.location.origin}/terminal`, "projectStudioTerminal", "popup=yes,width=1180,height=760,noopener,noreferrer");
+    });
+    $("openTools").addEventListener("click", openTools);
+    $("plusButton").addEventListener("click", openTools);
+    $("closeTools").addEventListener("click", closeTools);
+    $("toolsModal").addEventListener("click", (event) => {
+      if (event.target === $("toolsModal")) closeTools();
+    });
+    $("k8sList").addEventListener("click", () => runK8sList().catch((err) => appendTerminal(err.message, "terminal-error")));
+    $("mcpStatus").addEventListener("click", () => runMcp("status").catch((err) => appendTerminal(err.message, "terminal-error")));
+    $("mcpLogs").addEventListener("click", () => runMcp("logs").catch((err) => appendTerminal(err.message, "terminal-error")));
+    $("clearTerminal").addEventListener("click", () => { $("terminalHistory").innerHTML = ""; $("terminalInput").focus(); });
+    $("terminalShell").addEventListener("click", () => $("terminalInput").focus());
+    $("terminalInput").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        runTerminal().catch((err) => appendTerminal(err.message, "terminal-error"));
+      }
+      if (event.key === "ArrowUp") {
+        event.preventDefault();
+        state.terminalHistoryIndex = Math.max(0, state.terminalHistoryIndex - 1);
+        $("terminalInput").value = state.terminalCommands[state.terminalHistoryIndex] || "";
+      }
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        state.terminalHistoryIndex = Math.min(state.terminalCommands.length, state.terminalHistoryIndex + 1);
+        $("terminalInput").value = state.terminalCommands[state.terminalHistoryIndex] || "";
+      }
+    });
+    $("sendChat").addEventListener("click", () => sendChat().catch(handleChatError));
+    $("newChat").addEventListener("click", () => {
+      state.chatMessages = [];
+      localStorage.removeItem("projectStudioCodexChat");
+      setComposer("");
+      renderChat();
+    });
+    $("startSimpleAgent").addEventListener("click", () => {
+      submitPreset("Simple Mode로 새 AI Agent를 만들고 싶어. 빠른 설정 항목을 단계별로 진행해줘.");
+    });
+    $("startAdvancedAgent").addEventListener("click", () => {
+      submitPreset("Advanced Mode로 워크플로우 기반 AI Agent를 설계하고 싶어. 트리거, 액션, 배포 구성을 잡아줘.");
+    });
+    document.querySelector(".agent-card.recommended").addEventListener("click", (event) => {
+      if (event.target.closest("button")) return;
+      submitPreset("Simple Mode로 새 AI Agent를 만들고 싶어. 빠른 설정 항목을 단계별로 진행해줘.");
+    });
+    document.querySelector(".agent-card:not(.recommended)").addEventListener("click", (event) => {
+      if (event.target.closest("button")) return;
+      submitPreset("Advanced Mode로 워크플로우 기반 AI Agent를 설계하고 싶어. 트리거, 액션, 배포 구성을 잡아줘.");
+    });
+    const selectedMcps = new Set();
+    function renderSelectedMcps() {
+      const list = $("selectedMcpList");
+      const names = Array.from(selectedMcps);
+      $("selectedMcpCount").textContent = `${names.length} 개 선택됨`;
+      list.className = names.length ? "" : "selected-empty";
+      list.innerHTML = names.length
+        ? names.map((name) => `<div class="selected-mcp-item">${escapeHtml(name)}</div>`).join("")
+        : "선택된 MCP 서버가 없습니다.";
+    }
+    document.querySelectorAll(".mcp-server").forEach((button) => {
+      button.addEventListener("click", () => {
+        const name = button.dataset.name;
+        if (selectedMcps.has(name)) {
+          selectedMcps.delete(name);
+          button.classList.remove("selected");
+        } else {
+          selectedMcps.add(name);
+          button.classList.add("selected");
+        }
+        renderSelectedMcps();
+      });
+    });
+    $("mcpSearch").addEventListener("input", () => {
+      const query = $("mcpSearch").value.trim().toLowerCase();
+      document.querySelectorAll(".mcp-server").forEach((button) => {
+        button.hidden = Boolean(query) && !button.dataset.name.toLowerCase().includes(query);
+      });
+    });
+    $("agentDescription").addEventListener("input", () => {
+      $("descCount").textContent = `${$("agentDescription").value.length}/5000`;
+    });
+    $("cancelAgent").addEventListener("click", showWorkspaceHome);
+    $("goMyAgents").addEventListener("click", () => {
+      openTools();
+      setToolMessage("My Agents view is ready. Saved agents will appear here.");
+    });
+    $("saveAgent").addEventListener("click", () => {
+      const name = $("agentNameInput").value.trim() || "새 AI Agent";
+      $("agentStatus").textContent = `● ${name} 설정이 저장되었습니다.`;
+      $("agentStatus").style.background = "#e8f8ef";
+      $("agentStatus").style.color = "#1d8f55";
+    });
+    function runAgentPlayground() {
+      const name = $("agentNameInput").value.trim() || "새 AI Agent";
+      const msg = $("playgroundMessage").value.trim() || "Hello, introduce yourself";
+      submitPreset(`${name} 에이전트 테스트를 실행해줘. 테스트 메시지: ${msg}`);
+    }
+    $("runAgentTest").addEventListener("click", runAgentPlayground);
+    $("sendPlayground").addEventListener("click", runAgentPlayground);
+    document.querySelectorAll(".prompt-chip").forEach((button) => {
+      button.addEventListener("click", () => {
+        $("playgroundMessage").value = button.textContent.trim();
+        runAgentPlayground();
+      });
+    });
+    $("agentSelect").addEventListener("change", () => {
+      const value = $("agentSelect").value;
+      if (value === "Codex Ops") setComposer("Codex처럼 이 Kubernetes/서버 작업을 도와줘. 현재 상태부터 요약해줘.");
+      if (value === "Project Studio Ops") setComposer("Project Studio 운영 상태를 점검하고 다음 작업을 추천해줘.");
+      if (value === "Kubernetes Assistant") setComposer("Kubernetes 클러스터 상태를 점검하는 순서를 알려줘.");
+      if (value === "MCP Manager") setComposer("MCP 서버 상태 확인과 재시작 절차를 도와줘.");
+    });
+    document.querySelectorAll(".right-section-head").forEach((button) => {
+      button.addEventListener("click", () => {
+        button.closest(".right-section").classList.toggle("collapsed");
+      });
+    });
+    document.querySelector(".right-title button").addEventListener("click", (event) => {
+      event.currentTarget.textContent = event.currentTarget.textContent === "★" ? "☆" : "★";
+    });
+    document.querySelector(".avatar").addEventListener("click", () => $("tokenPop").classList.toggle("open"));
+    $("chatInput").addEventListener("input", () => {
+      $("sendChat").classList.toggle("ready", $("chatInput").value.trim().length > 0);
+    });
+    $("chatInput").addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendChat().catch(console.error);
+      }
+    });
+
+    renderChat();
+  </script>
+</body>
+</html>
