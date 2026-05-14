@@ -1,0 +1,7 @@
+.env
+*.pem
+audit.log
+.venv/
+.local-pkgs/
+__pycache__/
+*.pyc
